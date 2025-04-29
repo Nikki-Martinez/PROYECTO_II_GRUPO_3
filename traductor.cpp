@@ -1,8 +1,4 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <limits>
-#include <cstring>
+#include "librerias.h"
 using namespace std;
 
 
@@ -30,9 +26,9 @@ int main() {
         cout << "2. Leer" << endl;
         cout << "3. Actualizar" << endl;
         cout << "4. Borrar" << endl;
-        cout << "5. Traducir código" << endl;
-        cout << "0. Salir\n" << endl;
-        cout << "Seleccione una opción: ";
+        cout << "5. Traducir codigo" << endl;
+        cout << "0. Salir" << endl;
+        cout << "Seleccione una opcion: ";
         cin >> opcion;
         cin.ignore();
 
@@ -40,12 +36,29 @@ int main() {
             case 1: 
 				Crear(); 
 				break;
-            case 2: Leer(); break;
-            case 3: Actualizar(); break;
-            case 4: Borrar(); break;
-            case 5: TraducirCodigo(); break;
-            case 0: cout << "Saliendo del programa...\n"; break;
-            default: cout << "Opción no válida." << endl;
+				
+            case 2: 
+			    Leer();
+			    break;
+			    
+            case 3: 
+				Actualizar(); 
+				break;
+				
+            case 4: 
+				Borrar(); 
+				break;
+				
+            case 5: 
+				TraducirCodigo(); 
+				break;
+				
+            case 0: 
+				cout << "Saliendo del programa... " << endl; 
+				break;
+				
+            default: 
+				cout << "Opcion no valida." << endl;
         }
     } while (opcion != 0);
 
@@ -56,17 +69,17 @@ int main() {
 void Crear() {
     FILE* archivo = fopen(nombre_archivo, "a+b");
     if (!archivo) {
-        cout << "No se pudo abrir el archivo.\n";
+        cout << "No se pudo abrir el archivo." << endl;
         return;
     }
 
     char res;
     Palabra palabra;
     do {
-        cout << "\nIngrese Palabra (clave en el código): ";
+        cout << "Ingrese Palabra (clave en el codigo): ";
         cin.getline(palabra.palabra, 50);
 
-        cout << "Ingrese Traducción (al lenguaje destino): ";
+        cout << "Ingrese Traduccion (al lenguaje destino): ";
         cin.getline(palabra.traduccion, 50);
 
         cout << "Ingrese Funcionalidad: ";
@@ -93,8 +106,8 @@ void Leer() {
     Palabra palabra;
     int id = 0;
 
-    cout << "\nID | Palabra | Traducción | Funcionalidad\n";
-    cout << "-----------------------------------------------------------\n";
+    cout << "ID | Palabra | Traduccion | Funcionalidad" << endl;
+    cout << "-----------------------------------------------------------" << endl;
 
     fread(&palabra, sizeof(Palabra), 1, archivo);
     while (!feof(archivo)) {
@@ -111,7 +124,7 @@ void Leer() {
 void Actualizar() {
     FILE* archivo = fopen(nombre_archivo, "r+b");
     if (!archivo) {
-        cout << "No se pudo abrir el archivo.\n";
+        cout << "No se pudo abrir el archivo." << endl;
         return;
     }
 
@@ -124,10 +137,10 @@ void Actualizar() {
 
     fseek(archivo, id * sizeof(Palabra), SEEK_SET);
 
-    cout << "\nIngrese nueva Palabra: ";
+    cout << "Ingrese nueva Palabra: ";
     cin.getline(palabra.palabra, 50);
 
-    cout << "Ingrese nueva Traducción: ";
+    cout << "Ingrese nueva Traduccion: ";
     cin.getline(palabra.traduccion, 50);
 
     cout << "Ingrese nueva Funcionalidad: ";
@@ -146,7 +159,7 @@ void Borrar() {
     FILE* archivo_temp = fopen(nombre_temp, "w+b");
 
     if (!archivo || !archivo_temp) {
-        cout << "No se pudo abrir los archivos.\n";
+        cout << "No se pudo abrir los archivos." << endl;
         return;
     }
 
@@ -177,7 +190,7 @@ void Borrar() {
 void TraducirCodigo() {
     FILE* archivo = fopen(nombre_archivo, "rb");
     if (!archivo) {
-        cout << "No se encontraron palabras guardadas para traducir" << endl;;
+        cout << "No se encontraron palabras guardadas para traducir" << endl;
         return;
     }
 
@@ -195,7 +208,7 @@ void TraducirCodigo() {
     char continuar = 's';
 
     while (continuar == 's' || continuar == 'S') {
-        cout << "Ingrese una porcion de codigo por favor:\n";
+        cout << "Ingrese una porcion de codigo : " << endl;
         string input, line;
         int lineCount = 0;
 
@@ -212,10 +225,10 @@ void TraducirCodigo() {
 
         if (!input.empty()) {
             todosTextos.push_back(input);
-            cout << "\nCódigo pegado:\n" << input;
+            cout << "\nCodigo ingresado:\n" << input;
         }
 
-        cout << "\n¿Deseas pegar más código? (s/n): ";
+        cout << "\n¿Deseas ingresar mas codigo? (s/n): ";
         cin >> continuar;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
