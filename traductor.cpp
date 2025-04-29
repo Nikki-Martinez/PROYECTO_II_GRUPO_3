@@ -1,50 +1,58 @@
 #include <iostream>
+#include <string>
+#include <vector>
+#include <limits>
+#include <cstring>
 using namespace std;
 
-// Estructura para representar una palabra
+
 struct Palabra {
     char palabra[50];
     char traduccion[50];
     char funcionalidad[256];
 };
 
-// Nombre del archivo binario
+
 const char *nombre_archivo = "traductor.dat";
 
-// Declaraciones de funciones
+
 void Crear();
 void Leer();
 void Actualizar();
 void Borrar();
+void TraducirCodigo();
 
 int main() {
     int opcion;
     do {
-        cout << "\n------ Traductor ------\n";
-        cout << "1. Crear\n";
-        cout << "2. Leer\n";
-        cout << "3. Actualizar\n";
-        cout << "4. Borrar\n";
-        cout << "0. Salir\n";
-        cout << "Seleccione una opcion: ";
+        cout << "------ Traductor ------" << endl;
+        cout << "1. Crear" << endl;
+        cout << "2. Leer" << endl;
+        cout << "3. Actualizar" << endl;
+        cout << "4. Borrar" << endl;
+        cout << "5. Traducir código" << endl;
+        cout << "0. Salir\n" << endl;
+        cout << "Seleccione una opción: ";
         cin >> opcion;
         cin.ignore();
 
         switch (opcion) {
-            case 1: Crear(); break;
+            case 1: 
+				Crear(); 
+				break;
             case 2: Leer(); break;
             case 3: Actualizar(); break;
             case 4: Borrar(); break;
+            case 5: TraducirCodigo(); break;
             case 0: cout << "Saliendo del programa...\n"; break;
-            default: cout << "Opcion no valida. Intente nuevamente.\n";
+            default: cout << "Opción no válida." << endl;
         }
     } while (opcion != 0);
 
-    system("pause");
     return 0;
 }
 
-// Función para crear nuevos registros
+
 void Crear() {
     FILE* archivo = fopen(nombre_archivo, "a+b");
     if (!archivo) {
@@ -55,10 +63,10 @@ void Crear() {
     char res;
     Palabra palabra;
     do {
-        cout << "\nIngrese Palabra: ";
+        cout << "\nIngrese Palabra (clave en el código): ";
         cin.getline(palabra.palabra, 50);
 
-        cout << "Ingrese Traduccion: ";
+        cout << "Ingrese Traducción (al lenguaje destino): ";
         cin.getline(palabra.traduccion, 50);
 
         cout << "Ingrese Funcionalidad: ";
@@ -75,9 +83,8 @@ void Crear() {
     Leer();
 }
 
-// Función para leer y mostrar registros
+
 void Leer() {
-    system("cls");
     FILE* archivo = fopen(nombre_archivo, "rb");
     if (!archivo) {
         archivo = fopen(nombre_archivo, "w+b");
@@ -86,7 +93,7 @@ void Leer() {
     Palabra palabra;
     int id = 0;
 
-    cout << "\nID | Palabra | Traduccion | Funcionalidad\n";
+    cout << "\nID | Palabra | Traducción | Funcionalidad\n";
     cout << "-----------------------------------------------------------\n";
 
     fread(&palabra, sizeof(Palabra), 1, archivo);
@@ -100,7 +107,7 @@ void Leer() {
     fclose(archivo);
 }
 
-// Función para actualizar un registro por ID
+
 void Actualizar() {
     FILE* archivo = fopen(nombre_archivo, "r+b");
     if (!archivo) {
@@ -120,7 +127,7 @@ void Actualizar() {
     cout << "\nIngrese nueva Palabra: ";
     cin.getline(palabra.palabra, 50);
 
-    cout << "Ingrese nueva Traduccion: ";
+    cout << "Ingrese nueva Traducción: ";
     cin.getline(palabra.traduccion, 50);
 
     cout << "Ingrese nueva Funcionalidad: ";
@@ -132,7 +139,7 @@ void Actualizar() {
     Leer();
 }
 
-// Función para borrar un registro por ID
+
 void Borrar() {
     const char *nombre_temp = "temp.dat";
     FILE* archivo = fopen(nombre_archivo, "rb");
@@ -165,3 +172,68 @@ void Borrar() {
 
     Leer();
 }
+
+
+void TraducirCodigo() {
+    FILE* archivo = fopen(nombre_archivo, "rb");
+    if (!archivo) {
+        cout << "No se encontraron palabras guardadas para traducir" << endl;;
+        return;
+    }
+
+    vector<Palabra> palabras;
+    Palabra palabra;
+
+
+    while (fread(&palabra, sizeof(Palabra), 1, archivo)) {
+        palabras.push_back(palabra);
+    }
+    fclose(archivo);
+
+
+    vector<string> todosTextos;
+    char continuar = 's';
+
+    while (continuar == 's' || continuar == 'S') {
+        cout << "Ingrese una porcion de codigo por favor:\n";
+        string input, line;
+        int lineCount = 0;
+
+        while (true) {
+            getline(cin, line);
+            if (line.empty()) {
+                lineCount++;
+                if (lineCount >= 2) break;
+            } else {
+                lineCount = 0;
+            }
+            input += line + "\n";
+        }
+
+        if (!input.empty()) {
+            todosTextos.push_back(input);
+            cout << "\nCódigo pegado:\n" << input;
+        }
+
+        cout << "\n¿Deseas pegar más código? (s/n): ";
+        cin >> continuar;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+
+    cout << "\n--- Traducciones ---\n";
+    for (const auto& codigo : todosTextos) {
+        string codigoTraducido = codigo;
+
+        for (const auto& palabra : palabras) {
+            size_t pos = 0;
+            while ((pos = codigoTraducido.find(palabra.palabra, pos)) != string::npos) {
+                codigoTraducido.replace(pos, strlen(palabra.palabra), palabra.traduccion);
+                pos += strlen(palabra.traduccion);
+            }
+        }
+
+        cout << "\nOriginal:\n" << codigo;
+        cout << "Traducido:\n" << codigoTraducido << endl;
+    }
+}
+
