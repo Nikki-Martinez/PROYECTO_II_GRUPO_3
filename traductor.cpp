@@ -190,25 +190,23 @@ void Borrar() {
 void TraducirCodigo() {
     FILE* archivo = fopen(nombre_archivo, "rb");
     if (!archivo) {
-        cout << "No se encontraron palabras guardadas para traducir" << endl;
+        cout << "No se encontraron palabras guardadas para traducir." << endl;
         return;
     }
 
     vector<Palabra> palabras;
     Palabra palabra;
 
-
     while (fread(&palabra, sizeof(Palabra), 1, archivo)) {
         palabras.push_back(palabra);
     }
     fclose(archivo);
 
-
     vector<string> todosTextos;
     char continuar = 's';
 
     while (continuar == 's' || continuar == 'S') {
-        cout << "Ingrese una porcion de codigo : " << endl;
+        cout << "Ingrese una porcion de codigo: " << endl;
         string input, line;
         int lineCount = 0;
 
@@ -225,7 +223,7 @@ void TraducirCodigo() {
 
         if (!input.empty()) {
             todosTextos.push_back(input);
-            cout << "\nCodigo ingresado:\n" << input;
+            cout << "\nCódigo Ingresado:\n" << input;
         }
 
         cout << "\n¿Deseas ingresar mas codigo? (s/n): ";
@@ -239,9 +237,19 @@ void TraducirCodigo() {
 
         for (const auto& palabra : palabras) {
             size_t pos = 0;
+
+       
             while ((pos = codigoTraducido.find(palabra.palabra, pos)) != string::npos) {
-                codigoTraducido.replace(pos, strlen(palabra.palabra), palabra.traduccion);
-                pos += strlen(palabra.traduccion);
+                
+                bool esDelimitada =
+                    (pos == 0 || !isalnum(codigoTraducido[pos - 1])) && 
+                    (pos + strlen(palabra.palabra) == codigoTraducido.size() || !isalnum(codigoTraducido[pos + strlen(palabra.palabra)])); // No hay caracteres alfanuméricos después
+
+                if (esDelimitada) {
+                    codigoTraducido.replace(pos, strlen(palabra.palabra), palabra.traduccion);
+                }
+
+                pos += strlen(palabra.palabra); 
             }
         }
 
